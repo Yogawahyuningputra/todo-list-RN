@@ -1,235 +1,148 @@
 import * as React from 'react'
-import { FormControl, HStack, VStack, Box, Select, View, Text, Input, Heading, Badge, Avatar, Image, ScrollView, Checkbox } from 'native-base'
+import { useContext, useState, useEffect } from 'react'
+import { FormControl, Pressable, HStack, VStack, Box, Select, View, Text, Input, Heading, Badge, Image, ScrollView, Checkbox } from 'native-base'
+import User from './user'
+import { useQuery } from 'react-query'
+import { API } from '../config/api'
+import { UserContext } from '../context/userContext'
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
+import moment from 'moment'
 
 export default function List() {
+    const [state, dispatch] = useContext(UserContext)
+    const [date, setDate] = useState(new Date())
+    const [mode, setMode] = useState("date")
+    const [show, setShow] = useState(false)
+    const [text, setText] = useState("Choose date")
+
+    const ChangeDate = (event, selectedDate) => {
+
+        const currentDate = selectedDate || date
+        setShow(false)
+        setDate(currentDate)
+        let tempDate = new Date(currentDate)
+        let formatDate = tempDate.getDate() + " / " + (tempDate.getMonth() + 1) + " / " + tempDate.getFullYear()
+        setText(formatDate)
+    }
+    const showMode = (currentDate) => {
+        setShow(true)
+        setMode(currentDate)
+    }
+
+    const { data: todosData, refetch: todorefetch } = useQuery("todosDataCache", async () => {
+        const response = await API.get("/todos")
+        return response.data
+    })
+
+    const { data: categoryData } = useQuery("categoryDataCache", async () => {
+        const response = await API.get("/Categories")
+        return response.data
+    })
+    // console.log("isi todos", state?.user?.user)
+    useEffect(() => {
+        todorefetch()
+    }, [])
 
     return (
 
-        <Box alignItems="center" justifyContent="center" marginTop="5" w="100%">
-            <HStack space={215} marginBottom="1">
-                <View>
-                    <Heading>
-                        Hi Radif
-                    </Heading>
-                    <Text>200 list</Text>
-                </View>
-                <View>
-                    <Avatar bg="green.500" source={{
-                        uri: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"
-                    }}>
-                    </Avatar>
-                </View>
 
+        <Box alignItems="center" justifyContent="center" marginTop="5" w="100%">
+            <HStack space={196} marginBottom="1">
+                <View>
+                    <User />
+                </View>
             </HStack>
             <HStack space={3} justifyContent="center" w="90%" marginBottom="5">
                 <FormControl>
-                    <Input size="md" type="text" placeholder="Search list" backgroundColor={999999} />
+                    <Input size="md" type="text" placeholder="Search list" backgroundColor="lightgrey" />
                 </FormControl>
             </HStack>
+
             <HStack space={3} justifyContent="center" w="95%" marginBottom="5">
-                <FormControl w="106">
-                    <Input size="md" type="date" placeholder="choose date" backgroundColor={999999} />
+                <FormControl w="120">
+                    <Pressable p={3} h={46} bg="lightgrey" fontSize={10}
+                        // borderWidth={2}
+                        borderRadius={5}
+                        borderColor="muted.400"
+                        title="DatePicker"
+                        onPress={() => showMode("date")}
+                    >
+                        <HStack justifyContent="space-between">
+                            <Text fontSize={12} color="Gray.400">
+                                {text}
+                            </Text>
+                            <Text color="blueGray.400">
+                                <Ionicons name="calendar-outline" size={25} />
+                            </Text>
+                        </HStack>
+                    </Pressable>
                 </FormControl>
-                <Select w="106" accessibilityLabel="Choose Service" placeholder="Category" backgroundColor={999999}>
-                    <Select.Item label="UX Research" value="ux" />
-                    <Select.Item label="Web Development" value="web" />
-                    <Select.Item label="Cross Platform Development" value="cross" />
-                    <Select.Item label="UI Designing" value="ui" />
-                    <Select.Item label="Backend Development" value="backend" />
+                <Select w="100" accessibilityLabel="Choose Service" placeholder="Category" backgroundColor="lightgrey">
+                    {categoryData?.map((item, i) => (
+
+                        <Select.Item key={i} label={item?.name} value={item?.name} />
+                    ))}
+
                 </Select>
-                <Select w="106" accessibilityLabel="Choose Service" placeholder="Status" backgroundColor={999999}>
-                    <Select.Item label="UX Research" value="ux" />
-                    <Select.Item label="Web Development" value="web" />
-                    <Select.Item label="Cross Platform Development" value="cross" />
-                    <Select.Item label="UI Designing" value="ui" />
-                    <Select.Item label="Backend Development" value="backend" />
+                <Select w="100" accessibilityLabel="Choose Service" placeholder="Status" backgroundColor="lightgrey">
+                    <Select.Item label="to soon" value="to soon" />
                 </Select>
 
             </HStack>
-            <ScrollView h="470">
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#DAEFFF", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Study Golang
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Learn Golang to improve fundamentals and familiarize with coding.
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="primary" style={{ borderRadius: 5 }}>Study</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Checkbox colorScheme="green" style={{ borderRadius: 10, width: 30, height: 30 }} />
-
-                        </View>
-
-                    </VStack>
-                </HStack>
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#F1FFEF", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Home Work - Mathematics
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Do homework math probability
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="danger" style={{ borderRadius: 5 }}>Home Work</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Image source={require('../../assets/checklist.png')} alt="images" />
-                        </View>
-
-                    </VStack>
-                </HStack>
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#FFEFEF", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Study HTML
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Learn HTML to improve fundamentals and familiarize with coding.
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="primary" style={{ borderRadius: 5 }}>Study</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Image source={require('../../assets/Ellipse.png')} alt="date" />
-                        </View>
-
-                    </VStack>
-                </HStack>
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#FEFFDA", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Study Golang
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Learn Golang to improve fundamentals and familiarize with coding.
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="primary" style={{ borderRadius: 5 }}>Study</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Image source={require('../../assets/Ellipse.png')} alt="date" />
-                        </View>
-
-                    </VStack>
-                </HStack>
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#FEFFDA", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Study Golang
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Learn Golang to improve fundamentals and familiarize with coding.
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="primary" style={{ borderRadius: 5 }}>Study</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Image source={require('../../assets/Ellipse.png')} alt="date" />
-                        </View>
-
-                    </VStack>
-                </HStack>
-                <HStack space={3} justifyContent="center" style={{ backgroundColor: "#FEFFDA", height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
-                    <VStack paddingLeft={1} w="225">
-                        <View>
-                            <Text>
-                                Study Golang
-                            </Text>
-                        </View>
-                        <View h="71">
-                            <Text>
-                                Learn Golang to improve fundamentals and familiarize with coding.
-                            </Text>
-                        </View>
-                        <View>
-                            <Text>
-                                <Image source={require('../../assets/date.png')} alt="date" />{'  '}
-                                20 Januari 2022
-                            </Text>
-                        </View>
-
-                    </VStack>
-                    <VStack w="100">
-                        <View marginTop={2}>
-                            <Badge colorScheme="primary" style={{ borderRadius: 5 }}>Study</Badge>
-                        </View>
-                        <View marginTop={5} alignItems="center" justifyContent="center">
-                            <Image source={require('../../assets/Ellipse.png')} alt="date" />
-                        </View>
-
-                    </VStack>
-                </HStack>
+            <ScrollView h="530">
+                {todosData?.map((item, index) => {
+                    const random = Math.random();
+                    let color;
+                    if (random > 0.66) {
+                        color = "success";
+                    } else if (random > 0.33) {
+                        color = "info";
+                    } else {
+                        color = "warning";
+                    }
+                    return (
+                        <HStack onPress={() => navigation.navigate("detaillist")} key={index} space={3} justifyContent="center" backgroundColor={color} style={{ height: 120, width: 345, paddingHorizontal: 10, borderRadius: 5, marginBottom: 15 }}>
+                            <VStack paddingLeft={1} w="225" >
+                                <View>
+                                    <Text>
+                                        {item?.name}
+                                    </Text>
+                                </View>
+                                <View h="71">
+                                    <Text>
+                                        {item?.description}
+                                    </Text>
+                                </View>
+                                <View>
+                                    <Text>
+                                        <Image source={require('../../assets/date.png')} alt="date" style={{ height: 16, width: 16 }} />{'  '}
+                                        {moment(item?.date).format("DD MMMM YYYY")}
+                                    </Text>
+                                </View>
+                            </VStack>
+                            <VStack w="100">
+                                <View marginTop={2}>
+                                    <Badge colorScheme="danger" style={{ borderRadius: 5 }}>{item?.category[0].name}</Badge>
+                                </View>
+                                <View marginTop={5} alignItems="center" justifyContent="center">
+                                    <Checkbox colorScheme="green" style={{ borderRadius: 10, width: 30, height: 30 }} />
+                                </View>
+                            </VStack>
+                        </HStack>
+                    )
+                })}
             </ScrollView>
-
+            {show && (
+                <DateTimePicker
+                    testId="dateTimePicker"
+                    value={date}
+                    mode={mode}
+                    in24Hours={true}
+                    display="default"
+                    onChange={ChangeDate}
+                />
+            )}
         </Box >
 
     )

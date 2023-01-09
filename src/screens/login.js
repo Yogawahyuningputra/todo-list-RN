@@ -1,68 +1,51 @@
 import React, { useState, useContext } from "react"
-import { Box, Heading, Stack, FormControl, Text, Input, Image, Alert } from "native-base"
+import { useMutation } from "react-query"
+import { Box, Heading, Stack, FormControl, Text, Input, Image } from "native-base"
 import { View, TouchableOpacity } from "react-native"
 import { API } from "../config/api"
+import { showMessage } from 'react-native-flash-message'
+import { UserContext } from "../context/userContext"
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { showMessage, hideMessage } from 'react-native-flash-message'
-
-// import { UserContext } from "./context/userContext"
-// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Login({ navigation }) {
-    // const [state, dispatch] = useContext(UserContext)
-    const [dataLogin, setDataLogin] = useState({
-        email: '',
-        password: '',
 
+    const [state, dispatch] = useContext(UserContext)
+    const [dataLogin, setDataLogin] = useState({
+        email: "",
+        password: "",
     })
 
-    console.log(dataLogin)
-    const handleOnChange = (name, value) => {
+    function handleOnChange(name, value) {
         setDataLogin({
-            ...dataLogin, [name]: value,
+            ...dataLogin,
+            [name]: value,
         })
     }
-
-    const handleOnSubmit = async () => {
+    console.log(dataLogin)
+    const handleOnSubmit = useMutation(async (e) => {
         try {
-
-            const body = JSON.stringify(dataLogin)
-            const response = await API.post('/auth/login', dataLogin)
-            if (response?.status === 200) {
-
-                await AsyncStorage.setItem("token", response.data.token)
-                await AsyncStorage.setItem("user_id", response.data.user._id)
-                await AsyncStorage.setItem("name", response.data.user.firstName)
-
-                //     dispatch({
-                //         type: "LOGIN_SUCCESS",
-                //         payload: response.data
-
-                //     })
-            }
-            const token = await AsyncStorage.getItem("token")
-            if (token !== null) {
-                navigation.navigate("listtodo")
-                // alert("Login Successfull")
-                showMessage({
-                    message: "Login Successful", type: "info"
-                })
-            }
-            console.log(response)
-
-            alert("login success")
-            setDataLogin({
-                email: '',
-                password: '',
+            const response = await API.post("/auth/login", dataLogin)
+            AsyncStorage.setItem("token", response.data.token)
+            const payload = response.data
+            showMessage({
+                message: "Login Success!",
+                type: "success",
             })
-        } catch (error) {
-            alert("login failed, sorry ")
-            console.log(error)
+            dispatch({
+                type: "LOGIN_SUCCESS",
+                payload,
+            })
+            setAuthorization(response.data.token)
+            alert("Login Successfull")
+            navigation.navigate("listtodo")
+        } catch (err) {
+            console.log("Wrong  Email Or Password", err)
+            showMessage({
+                message: " Wrong  Email Or Password ",
+                type: "danger",
+            })
         }
-
-
-    }
-
+    })
     return (
 
         <Box flex={1} alignItems="center" justifyContent="center">
@@ -73,23 +56,25 @@ export default function Login({ navigation }) {
 
                 <Box alignItems="center">
 
-                    <FormControl style={{ marginVertical: 50 }} >
+                    <FormControl style={{ marginVertical: 40 }} >
                         <FormControl  >
                             <Heading>Login</Heading>
 
                             <FormControl style={{ marginVertical: 10 }}>
-                                <Input size="md" type="text" placeholder="Email" backgroundColor={999999} name="email" value={dataLogin.email} onChangeText={(value) => handleOnChange("email", value)} />
+                                <Input size="md" type="text" placeholder="Email" name="email" onChangeText={(value) => handleOnChange("email", value)} backgroundColor="lightgrey" />
                             </FormControl>
                             <FormControl>
-                                <Input size="md" type="text" placeholder="Password" backgroundColor={999999} name="password" value={dataLogin.password} onChangeText={(value) => handleOnChange("password", value)} />
+                                <Input size="md" type="text" secureTextEntry={true} placeholder="Password" name="password" onChangeText={(value) => handleOnChange("password", value)} backgroundColor="lightgrey" />
                             </FormControl>
                         </FormControl>
 
-                        <TouchableOpacity style={{ backgroundColor: "#FF5555", paddingHorizontal: 150, paddingVertical: 15, borderRadius: 5 }} onPress={handleOnSubmit}>
-                            <Text>Login</Text>
-                        </TouchableOpacity>
-                    </FormControl>
 
+                    </FormControl>
+                    <TouchableOpacity style={{ backgroundColor: "#FF5555", paddingHorizontal: 150, paddingVertical: 15, borderRadius: 5 }}
+                        onPress={() => handleOnSubmit.mutate()}
+                    >
+                        <Text style={{ color: "white", fontWeight: "bold" }}>Login</Text>
+                    </TouchableOpacity>
                     <View style={{ alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
                         <Text>New User ? <Text onPress={() => navigation.navigate("register")}>Register</Text></Text>
                     </View>

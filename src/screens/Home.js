@@ -1,5 +1,5 @@
 import { Image, Text, TouchableOpacity } from 'react-native';
-import { Center, VStack, View, Button } from "native-base";
+import { Center, VStack, View } from "native-base";
 
 export default function Home({ navigation }) {
     return (
@@ -19,10 +19,10 @@ export default function Home({ navigation }) {
             </Center>
             <Center>
                 <TouchableOpacity onPress={() => navigation.navigate("login")} style={{ backgroundColor: "#FF5555", paddingHorizontal: 150, paddingVertical: 15, borderRadius: 5, marginBottom: 10 }}>
-                    <Text>Login</Text>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>Login</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate("register")} style={{ backgroundColor: "#0000004F", paddingHorizontal: 140, paddingVertical: 15, borderRadius: 5 }}>
-                    <Text>Register</Text>
+                    <Text style={{ color: "white", fontWeight: "bold" }}>Register</Text>
                 </TouchableOpacity>
 
 

@@ -1,10 +1,10 @@
 import { createContext, useReducer } from "react"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const UserContext = createContext()
-
 const initialState = {
   isLogin: false,
-  user: {},
+  data: {},
 }
 
 const reducer = (state, action) => {
@@ -13,17 +13,17 @@ const reducer = (state, action) => {
   switch (type) {
     case "USER_SUCCESS":
     case "LOGIN_SUCCESS":
-      localStorage.setItem("token", payload.token)
+      AsyncStorage.setItem("token", payload?.token)
       return {
         isLogin: true,
-        user: payload,
+        data: payload,
       }
     case "AUTH_ERROR":
     case "LOGOUT":
-      localStorage.removeItem("token")
+      AsyncStorage.removeItem("token")
       return {
         isLogin: false,
-        user: {},
+        data: {},
       }
     default:
       throw new Error()

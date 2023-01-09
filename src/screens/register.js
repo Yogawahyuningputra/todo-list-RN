@@ -3,7 +3,7 @@ import { useState } from "react"
 import { Box, Heading, Image, Stack, FormControl, Text, Input, View } from "native-base"
 import { TouchableOpacity } from "react-native"
 import { API } from "../config/api"
-import { showMessage, hideMessage } from 'react-native-flash-message'
+import { showMessage } from 'react-native-flash-message'
 
 export default function Register({ navigation }) {
     const [register, setRegister] = useState({
@@ -57,17 +57,17 @@ export default function Register({ navigation }) {
                         <Heading>Register</Heading>
 
                         <FormControl style={{ marginVertical: 10 }}>
-                            <Input size="md" type="text" placeholder="Fullname" name="firstName" backgroundColor={999999} value={register.firstName} onChangeText={(value) => handleOnChange("firstName", value)} />
+                            <Input size="md" type="text" placeholder="Fullname" name="firstName" backgroundColor="lightgrey" value={register.firstName} onChangeText={(value) => handleOnChange("firstName", value)} />
                         </FormControl>
                         <FormControl style={{ marginBottom: 10 }}>
-                            <Input size="md" type="email" placeholder="Email" name="email" backgroundColor={999999} value={register.email} onChangeText={(value) => handleOnChange("email", value)} />
+                            <Input size="md" type="email" placeholder="Email" name="email" backgroundColor="lightgrey" value={register.email} onChangeText={(value) => handleOnChange("email", value)} />
                         </FormControl>
                         <FormControl>
-                            <Input size="md" type="password" placeholder="Password" name="password" backgroundColor={999999} value={register.password} onChangeText={(value) => handleOnChange("password", value)} />
+                            <Input size="md" type="password" placeholder="Password" name="password" backgroundColor="lightgrey" value={register.password} onChangeText={(value) => handleOnChange("password", value)} />
                         </FormControl>
 
                         <TouchableOpacity style={{ backgroundColor: "#FF5555", paddingHorizontal: 150, paddingVertical: 15, borderRadius: 5, marginTop: 25 }} onPress={handleOnSubmit}>
-                            <Text>Register</Text>
+                            <Text style={{ color: "white", fontWeight: "bold" }}>Register</Text>
                         </TouchableOpacity>
                         <View style={{ alignItems: 'center', justifyContent: "center", marginTop: 20 }}>
                             <Text>Joined us befored ? <Text onPress={() => navigation.navigate("login")}>Login</Text></Text>
